@@ -17,7 +17,6 @@
             ctx.beginPath();
             ctx.moveTo(this.brush_path.front().x, this.brush_path.front().y);
             while (!this.brush_path.empty()) {
-                console.log(this.brush_path.front());
                 ctx.lineTo(this.brush_path.front().x, this.brush_path.front().y);
                 this.brush_path.pop();
             }
@@ -39,7 +38,7 @@
     }
 
     getMouseRelativePosition(ev: MouseEvent): Point {
-        var client_rect = (<HTMLElement> event.target).getBoundingClientRect();
+        var client_rect = (<HTMLElement> ev.target).getBoundingClientRect();
         return {
             x: ev.clientX - client_rect.left,
             y: ev.clientY - client_rect.top
