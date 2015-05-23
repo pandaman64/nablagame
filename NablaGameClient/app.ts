@@ -29,7 +29,7 @@
     }
 
     draw(): void {
-        this.clear();
+        this.clearField();
         var ctx = this.base_field.getContext("2d");
         this.brush_history.forEach(
             (val, index, arr) => {
@@ -40,9 +40,13 @@
             });
     }
 
-    clear(): void {
+    clearField(): void {
         var ctx = this.base_field.getContext("2d");
         ctx.clearRect(0, 0, this.base_field.width, this.base_field.height);
+    }
+    
+    clearHistory(): void {
+        this.brush_history = new Array();
     }
 }
 
@@ -89,5 +93,9 @@ class Motion<T>{
 
 window.onload = () => {
     var base_field = new BaseField(<HTMLCanvasElement> document.getElementById("base_field"));
+    (<HTMLButtonElement> document.getElementById("clear_button")).onclick = (ev) => {
+        base_field.clearHistory();
+        base_field.clearField();
+    };
 };
 
