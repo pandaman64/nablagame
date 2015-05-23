@@ -1,38 +1,21 @@
 ﻿class BaseField {
     mousedown = false;
-    brush_path = new Motion<Point>();
-    prev_point: Point = null;
+    brush_history: Motion<Point>[] = new Array();
 
     constructor(public base_field: HTMLCanvasElement) {
         this.base_field.onmousedown = ev => {
             this.mousedown = true;
+            this.brush_history.push(new Motion<Point>());
         }
         this.base_field.onmouseup = ev => {
             this.mousedown = false;
-
-            if (this.brush_path.empty()) {
-                return;
-            }
-            var ctx = this.base_field.getContext("2d");
-            ctx.beginPath();
-            ctx.moveTo(this.brush_path.front().x, this.brush_path.front().y);
-            while (!this.brush_path.empty()) {
-                ctx.lineTo(this.brush_path.front().x, this.brush_path.front().y);
-                this.brush_path.pop();
-            }
-            ctx.stroke();
+            this.draw();
         }
         this.base_field.onmousemove = ev => {
-            if (this.prev_point === null) {
-                this.prev_point = {
-                    x: ev.offsetX,
-                    y: ev.offsetY
-                };
-                return;
-            }
             if (this.mousedown) {
                 var val = this.getMouseRelativePosition(ev);
-                this.brush_path.push(val);
+                this.brush_history[this.brush_history.length - 1].push(val);
+                this.draw();
             }
         };
     }
@@ -43,6 +26,23 @@
             x: ev.clientX - client_rect.left,
             y: ev.clientY - client_rect.top
         };
+    }
+
+    draw(): void {
+        this.clear();
+        var ctx = this.base_field.getContext("2d");
+        this.brush_history.forEach(
+            (val, index, arr) => {
+                ctx.beginPath();
+                ctx.moveTo(val.front().x, val.front().y);
+                val.forEach((v, i) => ctx.lineTo(v.x, v.y));
+                ctx.stroke();
+            });
+    }
+
+    clear(): void {
+        var ctx = this.base_field.getContext("2d");
+        ctx.clearRect(0, 0, this.base_field.width, this.base_field.height);
     }
 }
 
@@ -57,6 +57,12 @@ class Motion<T>{
     //access
     front(): T {
         return this.values_[0];
+    }
+    forEach(callback: (v:T, i:number) => void): void{
+        this.values_.forEach(
+            (val, index, array) => {
+                callback(val, index);
+            });
     }
 
     //length
