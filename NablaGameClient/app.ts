@@ -48,6 +48,12 @@
     clearHistory(): void {
         this.brush_history = new Array();
     }
+
+    undo(): void {
+        this.brush_history.pop();
+        this.clearField();
+        this.draw();
+    }
 }
 
 interface Point {
@@ -97,5 +103,6 @@ window.onload = () => {
         base_field.clearHistory();
         base_field.clearField();
     };
+    (<HTMLButtonElement> document.getElementById("undo_button")).onclick = (ev) => base_field.undo();
 };
 
